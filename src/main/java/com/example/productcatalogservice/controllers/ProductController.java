@@ -25,4 +25,12 @@ public class ProductController {
     public ProductDto createProduct(@RequestBody ProductDto productDto) {
         return productDto;
     }
+    @PutMapping("{id}")
+    public ProductDto updateProduct(@PathVariable("id") Long productId,@RequestBody ProductDto productDto) {
+        return productDto;
+    }
+    @DeleteMapping("{id}")
+    public void deleteProduct(@PathVariable("id") Long productId) {
+
+    }
 }
