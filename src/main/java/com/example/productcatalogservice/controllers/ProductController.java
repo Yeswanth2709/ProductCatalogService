@@ -2,6 +2,7 @@ package com.example.productcatalogservice.controllers;
 
 import com.example.productcatalogservice.dtos.ProductDto;
 import com.example.productcatalogservice.models.Product;
+import com.example.productcatalogservice.services.IProductService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -9,17 +10,19 @@ import java.util.List;
 @RestController
 @RequestMapping("/products")
 public class ProductController {
+    private IProductService productService;
+
+    public ProductController(IProductService productService) {
+        this.productService = productService;
+    }
+
     @GetMapping
     public List<Product> getAllProducts() {
         return null;
     }
     @GetMapping("/{id}")
     public Product getProduct(@PathVariable("id") Long productId ) {
-        Product product = new Product();
-        product.setId(productId);
-        product.setPrice(100000D);
-        product.setDescription("This is a test");
-        return product;
+        return productService.getProduct(productId);
     }
     @PostMapping
     public ProductDto createProduct(@RequestBody ProductDto productDto) {
