@@ -3,6 +3,8 @@ package com.example.productcatalogservice.controllers;
 import com.example.productcatalogservice.dtos.ProductDto;
 import com.example.productcatalogservice.models.Product;
 import com.example.productcatalogservice.services.IProductService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,15 +20,23 @@ public class ProductController {
 
     @GetMapping
     public List<Product> getAllProducts() {
-        return null;
+        return productService.getAllProducts();
     }
     @GetMapping("/{id}")
-    public Product getProduct(@PathVariable("id") Long productId ) {
-        return productService.getProduct(productId);
+    public ResponseEntity<Product> getProduct(@PathVariable("id") Long productId ) {
+        try {
+            if (productId == null || productId <= 0) {
+            throw new IllegalArgumentException("Invalid product id");
+            }
+            Product product = productService.getProduct(productId);
+            return new ResponseEntity<>(product, HttpStatus.OK);
+        }catch (Exception ex){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
     @PostMapping
-    public ProductDto createProduct(@RequestBody ProductDto productDto) {
-        return productDto;
+    public Product createProduct(@RequestBody ProductDto productDto) {
+        return productService.createProduct(productDto);
     }
     @PutMapping("{id}")
     public ProductDto updateProduct(@PathVariable("id") Long productId,@RequestBody ProductDto productDto) {
