@@ -5,7 +5,13 @@ import com.example.productcatalogservice.dtos.ProductDto;
 import com.example.productcatalogservice.models.Category;
 import com.example.productcatalogservice.models.Product;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RequestCallback;
+import org.springframework.web.client.ResponseExtractor;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -37,11 +43,42 @@ public class ProductService implements IProductService {
         return getProduct(fakeStoreProductDto);
     }
     @Override
-    public Product createProduct(ProductDto productDto) {
+    public Product createProduct(Product product) {
         RestTemplate restTemplate = restTemplateBuilder.build();
-        FakeStoreProductDto fakeStoreProductDto = restTemplate.postForEntity("https://fakestoreapi.com/products",productDto, FakeStoreProductDto.class).getBody();
+        FakeStoreProductDto fakeStoreProductDtoReq = getFakeStoreProductDto(product);
+        FakeStoreProductDto fakeStoreProductDto = restTemplate.postForEntity("https://fakestoreapi.com/products",fakeStoreProductDtoReq, FakeStoreProductDto.class).getBody();
         return getProduct(fakeStoreProductDto);
     }
+
+    @Override
+    public Product replaceProduct(Long productId, Product product) {
+        RestTemplate restTemplate = restTemplateBuilder.build();
+        FakeStoreProductDto fakeStoreProductDtoReq = getFakeStoreProductDto(product);
+        ResponseEntity<FakeStoreProductDto> fakeStoreProductDtoResponseEntity = postForEntity("https://fakestoreapi.com/products/{id}", fakeStoreProductDtoReq, FakeStoreProductDto.class, productId);
+        return getProduct(fakeStoreProductDtoResponseEntity.getBody());
+    }
+
+    @Override
+    public Product deleteProduct(Long productId) {
+        RestTemplate restTemplate = restTemplateBuilder.build();
+        ResponseEntity<FakeStoreProductDto> fakeStoreProductDtoResponseEntity = deleteForEntity("https://fakestoreapi.com/products/{id}", FakeStoreProductDto.class, productId);
+        return getProduct(fakeStoreProductDtoResponseEntity.getBody());
+
+    }
+
+    private <T> ResponseEntity<T> postForEntity(String url, @Nullable Object request, Class<T> responseType, Object... uriVariables) throws RestClientException {
+        RestTemplate restTemplate=restTemplateBuilder.build();
+        RequestCallback requestCallback = restTemplate.httpEntityCallback(request, responseType);
+        ResponseExtractor<ResponseEntity<T>> responseExtractor = restTemplate.responseEntityExtractor(responseType);
+        return restTemplate.execute(url, HttpMethod.PUT, requestCallback, responseExtractor, uriVariables);
+    }
+    private  <T> ResponseEntity<T> deleteForEntity(String url, Class<T> responseType, Object... uriVariables) throws RestClientException {
+        RestTemplate restTemplate=restTemplateBuilder.build();
+        RequestCallback requestCallback = restTemplate.acceptHeaderRequestCallback(responseType);
+        ResponseExtractor<ResponseEntity<T>> responseExtractor = restTemplate.responseEntityExtractor(responseType);
+        return restTemplate.execute(url, HttpMethod.DELETE, requestCallback, responseExtractor, uriVariables);
+    }
+
     private Product getProduct(FakeStoreProductDto fakeStoreProductDto) {
         Product product = new Product();
         product.setId(fakeStoreProductDto.getId());
@@ -53,5 +90,13 @@ public class ProductService implements IProductService {
         category.setName(fakeStoreProductDto.getCategory());
         product.setCategory(category);
         return product;
+    }
+    private FakeStoreProductDto getFakeStoreProductDto(Product product) {
+        FakeStoreProductDto fakeStoreProductDto = new FakeStoreProductDto();
+        fakeStoreProductDto.setDescription(product.getDescription());
+        fakeStoreProductDto.setImage(product.getImageUrl());
+        fakeStoreProductDto.setCategory(product.getCategory().getName());
+        fakeStoreProductDto.setPrice(product.getPrice());
+        return fakeStoreProductDto;
     }
 }

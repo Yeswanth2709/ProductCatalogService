@@ -36,14 +36,24 @@ public class ProductController {
     }
     @PostMapping
     public Product createProduct(@RequestBody ProductDto productDto) {
-        return productService.createProduct(productDto);
+        return productService.createProduct(getProduct(productDto));
     }
     @PutMapping("{id}")
-    public ProductDto updateProduct(@PathVariable("id") Long productId,@RequestBody ProductDto productDto) {
-        return productDto;
+    public Product replaceProduct(@PathVariable("id") Long productId,@RequestBody ProductDto productDto) {
+        return productService.replaceProduct(productId,getProduct(productDto));
     }
     @DeleteMapping("{id}")
-    public void deleteProduct(@PathVariable("id") Long productId) {
-
+    public Product deleteProduct(@PathVariable("id") Long productId) {
+        return productService.deleteProduct(productId);
+    }
+    private Product getProduct(ProductDto productDto) {
+        Product product = new Product();
+        product.setName(productDto.getName());
+        product.setDescription(productDto.getDescription());
+        product.setPrice(productDto.getPrice());
+        product.setCategory(productDto.getCategory());
+        product.setId(productDto.getId());
+        product.setImageUrl(productDto.getImageUrl());
+        return product;
     }
 }
