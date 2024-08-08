@@ -31,7 +31,7 @@ public class ProductController {
             Product product = productService.getProduct(productId);
             return new ResponseEntity<>(product, HttpStatus.OK);
         }catch (Exception ex){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw ex;
         }
     }
     @PostMapping
