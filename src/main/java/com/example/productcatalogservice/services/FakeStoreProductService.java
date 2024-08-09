@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 @Service
-public class ProductService implements IProductService {
+public class FakeStoreProductService implements IProductService {
     private FakeStoreApiClient fakeStoreApiClient;
 
-    public ProductService(FakeStoreApiClient fakeStoreApiClient) {
+    public FakeStoreProductService(FakeStoreApiClient fakeStoreApiClient) {
         this.fakeStoreApiClient = fakeStoreApiClient;
     }
 

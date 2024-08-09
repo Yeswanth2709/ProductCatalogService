@@ -52,7 +52,7 @@ public class ProductController {
         product.setDescription(productDto.getDescription());
         product.setPrice(productDto.getPrice());
         product.setCategory(productDto.getCategory());
-        product.setId(productDto.getId());
+        //product.setId(productDto.getId());
         product.setImageUrl(productDto.getImageUrl());
         return product;
     }
